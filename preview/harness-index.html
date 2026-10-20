@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8" />
+<title>balance-gauge harness</title>
+<style>
+  body { margin: 0; padding: 14px; background: #f6f7f9; font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif; }
+  .case { margin-bottom: 10px; }
+  .cap { font-size: 11px; color: #8d93a1; margin: 0 0 4px 2px; }
+  iframe { width: 360px; height: 130px; border: 1px solid #e4e7ec; border-radius: 10px; background: #fff; }
+</style>
+<body>
+<div class="case"><div class="cap">amount=6.4</div><iframe src="./harness.html?amount=6.4"></iframe></div>
+<div class="case"><div class="cap">amount=10</div><iframe src="./harness.html?amount=10"></iframe></div>
+<div class="case"><div class="cap">amount=88.5</div><iframe src="./harness.html?amount=88.5"></iframe></div>
+<div class="case"><div class="cap">amount=fail</div><iframe src="./harness.html?amount=fail"></iframe></div>
+<div class="case"><div class="cap">amount=signedout</div><iframe src="./harness.html?amount=signedout"></iframe></div>
+</body>
+</html>

@@ -1,0 +1,192 @@
+/* Balance + speed gauges — every class is prefixed `bg-` so it cannot collide
+   with the shell. The pair lives in the sidebar footer row, directly above the
+   account launcher, and deliberately has no card chrome: no fill, no stroke,
+   no shadow, just a row highlight on hover. */
+
+.bg-root {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  padding: 0 0 6px;
+  box-sizing: border-box;
+}
+
+.bg-card {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-width: 0;
+  padding: 5px 7px;
+  margin: 0 0 2px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--dsw-font-family, inherit);
+  transition: background-color 0.15s ease;
+}
+
+.bg-card:hover {
+  background: var(--dsw-alias-interactive-bg-hover, rgba(16, 24, 40, 0.05));
+}
+
+.bg-card:active {
+  background: var(--dsw-alias-interactive-bg-hover, rgba(16, 24, 40, 0.07));
+}
+
+.bg-card:focus-visible {
+  outline: 2px solid var(--dsw-focus-ring-color, #4d6bfe);
+  outline-offset: 1px;
+}
+
+.bg-cell {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.bg-divider {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  background: var(--dsw-alias-border-l2, #e4e7ec);
+  opacity: 0.9;
+}
+
+.bg-dial-host {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.bg-dial {
+  display: block;
+  flex: none;
+  width: 46px;
+  height: 26px;
+  overflow: visible;
+}
+
+.bg-track {
+  fill: none;
+  stroke: var(--dsw-alias-border-l2, #e4e7ec);
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.bg-arc {
+  fill: none;
+  stroke-width: 9;
+  stroke-linecap: round;
+  transition: opacity 0.4s ease;
+}
+
+.bg-speed {
+  stroke: var(--dsw-alias-state-business-primary, #4d6bfe);
+}
+
+.bg-dial--dim .bg-arc {
+  opacity: 0.28;
+}
+
+.bg-dial--dim .bg-track {
+  opacity: 0.7;
+}
+
+/* The needle is driven frame by frame from client.js (damped spring), so it
+   must not also carry a CSS transition. */
+.bg-needle {
+  transform-box: view-box;
+  transform-origin: 60px 60px;
+  will-change: transform;
+}
+
+.bg-blade {
+  fill: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-tip {
+  fill: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-glow {
+  pointer-events: none;
+}
+
+.bg-hub {
+  fill: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-hub-dot {
+  fill: var(--dsw-alias-bg-base, #ffffff);
+}
+
+.bg-readout {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.bg-amount {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+  color: var(--dsw-alias-label-primary, #1f2329);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+.bg-amount--speed {
+  color: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-card[data-zone='low'] .bg-amount--money {
+  color: var(--bg-zone-ink, #c0554d);
+}
+
+.bg-card[data-zone='high'] .bg-amount--money {
+  color: var(--bg-zone-ink, #3f8a66);
+}
+
+.bg-sub {
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--dsw-alias-label-tertiary, #8d93a1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bg-pulse {
+  animation: bg-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes bg-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-needle,
+  .bg-arc {
+    transition: none;
+  }
+  .bg-pulse {
+    animation: none;
+  }
+}

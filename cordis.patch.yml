@@ -1,0 +1,5 @@
+# Balance + speed gauge for the DeepSeek Harness web GUI.
+# Self-mounting: `dsh plugin add dsh-balance-gauge` appends this layer.
+- insert:
+    - id: balance-gauge
+      name: dsh-balance-gauge

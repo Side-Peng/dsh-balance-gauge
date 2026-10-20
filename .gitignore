@@ -1,0 +1,5 @@
+# 本地开发残留（构建产物 lib/client.js 提交进仓库，安装方无需构建步骤）
+preview/*.png
+!preview/gauge.png
+*.log
+.DS_Store

@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8" />
+<title>dsh-balance-gauge preview</title>
+<style>
+  /* Balance + speed gauges — every class is prefixed `bg-` so it cannot collide
+   with the shell. The pair lives in the sidebar footer row, directly above the
+   account launcher, and deliberately has no card chrome: no fill, no stroke,
+   no shadow, just a row highlight on hover. */
+
+.bg-root {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  padding: 0 0 6px;
+  box-sizing: border-box;
+}
+
+.bg-card {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-width: 0;
+  padding: 5px 7px;
+  margin: 0 0 2px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+  user-select: none;
+  font-family: var(--dsw-font-family, inherit);
+  transition: background-color 0.15s ease;
+}
+
+.bg-card:hover {
+  background: var(--dsw-alias-interactive-bg-hover, rgba(16, 24, 40, 0.05));
+}
+
+.bg-card:active {
+  background: var(--dsw-alias-interactive-bg-hover, rgba(16, 24, 40, 0.07));
+}
+
+.bg-card:focus-visible {
+  outline: 2px solid var(--dsw-focus-ring-color, #4d6bfe);
+  outline-offset: 1px;
+}
+
+.bg-cell {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.bg-divider {
+  flex: none;
+  width: 1px;
+  height: 20px;
+  background: var(--dsw-alias-border-l2, #e4e7ec);
+  opacity: 0.9;
+}
+
+.bg-dial-host {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.bg-dial {
+  display: block;
+  flex: none;
+  width: 46px;
+  height: 26px;
+  overflow: visible;
+}
+
+.bg-track {
+  fill: none;
+  stroke: var(--dsw-alias-border-l2, #e4e7ec);
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.bg-arc {
+  fill: none;
+  stroke-width: 9;
+  stroke-linecap: round;
+  transition: opacity 0.4s ease;
+}
+
+.bg-speed {
+  stroke: var(--dsw-alias-state-business-primary, #4d6bfe);
+}
+
+.bg-dial--dim .bg-arc {
+  opacity: 0.28;
+}
+
+.bg-dial--dim .bg-track {
+  opacity: 0.7;
+}
+
+/* The needle is driven frame by frame from client.js (damped spring), so it
+   must not also carry a CSS transition. */
+.bg-needle {
+  transform-box: view-box;
+  transform-origin: 60px 60px;
+  will-change: transform;
+}
+
+.bg-blade {
+  fill: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-tip {
+  fill: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-glow {
+  pointer-events: none;
+}
+
+.bg-hub {
+  fill: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-hub-dot {
+  fill: var(--dsw-alias-bg-base, #ffffff);
+}
+
+.bg-readout {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.15;
+}
+
+.bg-amount {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+  color: var(--dsw-alias-label-primary, #1f2329);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.3s ease;
+}
+
+.bg-amount--speed {
+  color: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-card[data-zone='low'] .bg-amount--money {
+  color: var(--bg-zone-ink, #c0554d);
+}
+
+.bg-card[data-zone='high'] .bg-amount--money {
+  color: var(--bg-zone-ink, #3f8a66);
+}
+
+.bg-sub {
+  font-size: 10px;
+  line-height: 1.35;
+  color: var(--dsw-alias-label-tertiary, #8d93a1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bg-pulse {
+  animation: bg-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes bg-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-needle,
+  .bg-arc {
+    transition: none;
+  }
+  .bg-pulse {
+    animation: none;
+  }
+}
+
+  :root {
+    --dsw-font-family: 'Segoe UI', 'Microsoft YaHei', system-ui, sans-serif;
+    --dsw-alias-label-primary: #1f2329;
+    --dsw-alias-label-tertiary: #8d93a1;
+    --dsw-alias-border-l2: #e4e7ec;
+    --dsw-alias-bg-base: #ffffff;
+    --dsw-alias-state-business-primary: #4d6bfe;
+  }
+  body { margin: 0; padding: 22px; background: #f6f7f9; font-family: var(--dsw-font-family); }
+  h1 { font: 600 15px/1.3 var(--dsw-font-family); color: #1f2329; margin: 0 0 4px; }
+  h2 { font: 600 12px/1.3 var(--dsw-font-family); color: #5c6270; margin: 26px 0 8px; }
+  p.hint { margin: 0 0 4px; font-size: 12px; color: #8d93a1; }
+  .grid { display: grid; grid-template-columns: repeat(3, 280px); gap: 16px 22px; }
+  .sample { display: flex; flex-direction: column; gap: 6px; width: 280px; }
+  .sample-label { font-size: 11px; color: #8d93a1; padding-left: 2px; }
+  .sample .bg-root, .foot .bg-root { padding: 0; }
+  .foot { width: 280px; padding: 10px; box-sizing: border-box; border: 1px dashed #d8dce4; border-radius: 14px; background: #f7f8fa; }
+  .foot .sample { width: auto; }
+  .foot .sample-label { display: none; }
+  .account-row { display: flex; align-items: center; gap: 8px; margin-top: 4px; padding: 6px 8px; border-radius: 11px; background: #eceef2; color: #3b4050; font-size: 12px; }
+  .avatar { width: 22px; height: 22px; border-radius: 50%; background: #dfe4f5; color: #4c5a86; font-size: 11px; display: flex; align-items: center; justify-content: center; flex: none; }
+  .who { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .chev { color: #a7adba; font-size: 11px; }
+  .dark { margin-top: 30px; padding: 22px; border-radius: 16px; background: #16181d;
+    --dsw-alias-label-primary: #f2f3f5; --dsw-alias-label-tertiary: #8b909b;
+    --dsw-alias-border-l2: #2b2f37; --dsw-alias-bg-base: #1c1f26;
+    --dsw-alias-state-business-primary: #6b83ff; }
+  .dark h1 { color: #f2f3f5; }
+  .dark .foot { background: #1a1d23; border-color: #333844; }
+  .dark .account-row { background: #242832; color: #dfe2e9; }
+  .dark .avatar { background: #333c56; color: #c3ccea; }
+</style>
+<body>
+  <h1>余额 + 速度 双表 · 状态预览</h1>
+  <p class="hint">满格 ¥100 / 500 tok/s（0 在左端、500 在右端，线性 180°）· 余额小于 10 红、10 到 50 黄、大于 50 绿</p>
+
+  <h2>实际位置（侧边栏宽 280px，账户行正上方）</h2>
+  <div class="foot">
+<div class="sample"><div class="sample-label">余额 88.50 · 平均 237 tok/s</div><div class="bg-root"><div class="bg-card" data-zone="high" data-phase="ready" style="--bg-zone-ink:#3F8A66"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 89%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(69.30deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#6BA689" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥88.50</span><span class="bg-sub">😄 油箱满满</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 47%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-speed" d="M 18.00 60.00 A 42 42 0 0 1 56.57 18.14" /><g class="bg-needle" style="transform: rotate(-4.68deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">237</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">余额 6.40 · 空闲</div><div class="bg-root"><div class="bg-card" data-zone="low" data-phase="ready" style="--bg-zone-ink:#C0554D"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 6%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-pulse" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(-78.48deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#D96C64" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥6.40</span><span class="bg-sub">😰 油快没啦</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 0%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><g class="bg-needle" style="transform: rotate(-90.00deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">0</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+    <div class="account-row">
+      <span class="avatar">彭</span>
+      <span class="who">账户 · 已登录</span>
+      <span class="chev">⌃</span>
+    </div>
+  </div>
+
+  <h2>状态</h2>
+  <div class="grid">
+<div class="sample"><div class="sample-label">余额 6.40 · 空闲</div><div class="bg-root"><div class="bg-card" data-zone="low" data-phase="ready" style="--bg-zone-ink:#C0554D"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 6%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-pulse" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(-78.48deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#D96C64" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥6.40</span><span class="bg-sub">😰 油快没啦</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 0%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><g class="bg-needle" style="transform: rotate(-90.00deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">0</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">余额 32.80 · 平均 120 tok/s</div><div class="bg-root"><div class="bg-card" data-zone="mid" data-phase="ready"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 33%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(-30.96deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#D9A05F" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥32.80</span><span class="bg-sub">🙂 还够跑一阵</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 24%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-speed" d="M 18.00 60.00 A 42 42 0 0 1 29.38 31.25" /><g class="bg-needle" style="transform: rotate(-46.80deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">120</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">余额 88.50 · 平均 237 tok/s</div><div class="bg-root"><div class="bg-card" data-zone="high" data-phase="ready" style="--bg-zone-ink:#3F8A66"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 89%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(69.30deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#6BA689" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥88.50</span><span class="bg-sub">😄 油箱满满</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 47%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-speed" d="M 18.00 60.00 A 42 42 0 0 1 56.57 18.14" /><g class="bg-needle" style="transform: rotate(-4.68deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">237</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">余额 1288 · 顶格 500 tok/s</div><div class="bg-root"><div class="bg-card" data-zone="high" data-phase="ready" style="--bg-zone-ink:#3F8A66"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 100%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(90.00deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#6BA689" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥1,288.00</span><span class="bg-sub">😄 油箱满满</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 100%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-speed" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><g class="bg-needle" style="transform: rotate(90.00deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">500</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">未登录</div><div class="bg-root"><div class="bg-card" data-zone="unknown" data-phase="unavailable"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 0%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">--</span><span class="bg-sub">🔒 先登录账户</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 0%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><g class="bg-needle" style="transform: rotate(-90.00deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">0</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">读取失败</div><div class="bg-root"><div class="bg-card" data-zone="unknown" data-phase="failed"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 0%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">--</span><span class="bg-sub">🥲 读不到数，点我重试</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 0%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><g class="bg-needle" style="transform: rotate(-90.00deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">0</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">加载中</div><div class="bg-root"><div class="bg-card" data-zone="unknown" data-phase="loading"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 0%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">···</span><span class="bg-sub">⛽ 正在量油…</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 0%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><g class="bg-needle" style="transform: rotate(-90.00deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">0</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">还没拿到用量数据</div><div class="bg-root"><div class="bg-card" data-zone="high" data-phase="ready" style="--bg-zone-ink:#3F8A66"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 89%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(69.30deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#6BA689" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥88.50</span><span class="bg-sub">😄 油箱满满</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 0%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">0</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+  </div>
+
+  <div class="dark">
+    <h1>深色主题</h1>
+    <div class="foot">
+<div class="sample"><div class="sample-label">余额 88.50 · 平均 237 tok/s</div><div class="bg-root"><div class="bg-card" data-zone="high" data-phase="ready" style="--bg-zone-ink:#3F8A66"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 89%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(69.30deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#6BA689" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥88.50</span><span class="bg-sub">😄 油箱满满</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 47%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-speed" d="M 18.00 60.00 A 42 42 0 0 1 56.57 18.14" /><g class="bg-needle" style="transform: rotate(-4.68deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">237</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+      <div class="account-row">
+      <span class="avatar">彭</span>
+      <span class="who">账户 · 已登录</span>
+      <span class="chev">⌃</span>
+    </div>
+    </div>
+    <div class="grid" style="margin-top:16px">
+<div class="sample"><div class="sample-label">余额 6.40 · 空闲</div><div class="bg-root"><div class="bg-card" data-zone="low" data-phase="ready" style="--bg-zone-ink:#C0554D"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 6%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-pulse" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(-78.48deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#D96C64" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥6.40</span><span class="bg-sub">😰 油快没啦</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 0%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><g class="bg-needle" style="transform: rotate(-90.00deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">0</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">余额 32.80 · 平均 120 tok/s</div><div class="bg-root"><div class="bg-card" data-zone="mid" data-phase="ready"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 33%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(-30.96deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#D9A05F" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥32.80</span><span class="bg-sub">🙂 还够跑一阵</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 24%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-speed" d="M 18.00 60.00 A 42 42 0 0 1 29.38 31.25" /><g class="bg-needle" style="transform: rotate(-46.80deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">120</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">余额 88.50 · 平均 237 tok/s</div><div class="bg-root"><div class="bg-card" data-zone="high" data-phase="ready" style="--bg-zone-ink:#3F8A66"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 89%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(69.30deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#6BA689" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥88.50</span><span class="bg-sub">😄 油箱满满</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 47%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-speed" d="M 18.00 60.00 A 42 42 0 0 1 56.57 18.14" /><g class="bg-needle" style="transform: rotate(-4.68deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">237</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+<div class="sample"><div class="sample-label">余额 1288 · 顶格 500 tok/s</div><div class="bg-root"><div class="bg-card" data-zone="high" data-phase="ready" style="--bg-zone-ink:#3F8A66"><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 100%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#D96C64" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#D9A05F" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#6BA689" /><g class="bg-needle" style="transform: rotate(90.00deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#6BA689" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--money">¥1,288.00</span><span class="bg-sub">😄 油箱满满</span></span></span><span class="bg-divider"></span><span class="bg-cell"><span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="输出速度 100%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc bg-speed" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><g class="bg-needle" style="transform: rotate(90.00deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#4D6BFE" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span><span class="bg-readout"><span class="bg-amount bg-amount--speed">500</span><span class="bg-sub">tok/s</span></span></span></div></div></div>
+    </div>
+  </div>
+</body>
+</html>

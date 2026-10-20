@@ -1,0 +1,211 @@
+<!doctype html><meta charset="utf-8"><title>floating</title>
+<style>
+/* Balance gauge — every class is prefixed `bg-` so it cannot collide with the
+   shell. Colours fall back to literal values when a theme token is missing. */
+
+.bg-root {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: var(--dsh-composer-card-max-width, 760px);
+  margin: 0 auto;
+  padding: 2px 16px 0;
+  box-sizing: border-box;
+}
+
+.bg-card {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 4px 11px 4px 6px;
+  border-radius: 15px;
+  border: 1px solid var(--dsw-alias-border-l2, #e4e7ec);
+  background: var(--dsw-alias-settings-card-fill, var(--dsw-alias-bg-base, #ffffff));
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  font-family: var(--dsw-font-family, inherit);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.bg-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(16, 24, 40, 0.09);
+}
+
+.bg-card:active {
+  transform: translateY(0);
+}
+
+.bg-card[data-floating='true'] {
+  box-shadow: 0 10px 28px rgba(16, 24, 40, 0.16);
+}
+
+.bg-card--dragging {
+  cursor: grabbing;
+  transform: none;
+  box-shadow: 0 16px 38px rgba(16, 24, 40, 0.22);
+  transition: none;
+}
+
+.bg-card:focus-visible {
+  outline: 2px solid var(--dsw-focus-ring-color, #4d6bfe);
+  outline-offset: 2px;
+}
+
+.bg-dial-host {
+  display: flex;
+  flex: none;
+  align-items: center;
+}
+
+.bg-dial {
+  display: block;
+  flex: none;
+  width: 92px;
+  height: 52px;
+  overflow: visible;
+}
+
+.bg-track {
+  fill: none;
+  stroke: var(--dsw-alias-border-l2, #e4e7ec);
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.bg-dial--dim .bg-arc {
+  opacity: 0.28;
+}
+
+.bg-dial--dim .bg-track {
+  opacity: 0.7;
+}
+
+.bg-arc {
+  fill: none;
+  stroke-width: 9;
+  stroke-linecap: round;
+  transition: opacity 0.4s ease;
+}
+
+.bg-needle {
+  transform-box: view-box;
+  transform-origin: 60px 60px;
+  transition: transform 0.95s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bg-blade {
+  fill: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-tip {
+  fill: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-glow {
+  pointer-events: none;
+}
+
+.bg-hub {
+  fill: var(--dsw-alias-label-primary, #1f2329);
+}
+
+.bg-hub-dot {
+  fill: var(--dsw-alias-bg-base, #ffffff);
+}
+
+.bg-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 76px;
+  line-height: 1.15;
+}
+
+.bg-amount {
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+  color: var(--dsw-alias-label-primary, #1f2329);
+  font-variant-numeric: tabular-nums;
+  transition: color 0.3s ease;
+}
+
+.bg-card[data-zone='low'] .bg-amount {
+  color: #f2574f;
+}
+
+.bg-card[data-zone='high'] .bg-amount {
+  color: #2a9d6a;
+}
+
+.bg-sub {
+  font-size: 11px;
+  line-height: 1.25;
+  color: var(--dsw-alias-label-tertiary, #8d93a1);
+  white-space: nowrap;
+}
+
+.bg-pct {
+  font-size: 10px;
+  color: var(--dsw-alias-label-tertiary, #8d93a1);
+  font-variant-numeric: tabular-nums;
+}
+
+.bg-spark {
+  transform-box: view-box;
+  transform-origin: 60px 60px;
+}
+
+.bg-pulse {
+  animation: bg-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes bg-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-card,
+  .bg-needle,
+  .bg-arc {
+    transition: none;
+  }
+  .bg-pulse {
+    animation: none;
+  }
+}
+
+:root{--dsw-font-family:'Segoe UI','Microsoft YaHei';
+--dsw-alias-label-primary:#1f2329;--dsw-alias-label-secondary:#5c6270;--dsw-alias-label-tertiary:#8d93a1;
+--dsw-alias-border-l2:#e4e7ec;--dsw-alias-bg-base:#fff;--dsw-alias-settings-card-fill:#fff}
+body{margin:0;background:#f6f7f9;font-family:var(--dsw-font-family);height:560px}
+.top{height:44px;border-bottom:1px solid #e9ebf0;background:#fff;display:flex;align-items:center;padding:0 18px;color:#8d93a1;font-size:12px}
+.chat{padding:22px 26px;display:flex;flex-direction:column;gap:12px;max-width:520px}
+.bubble{background:#fff;border:1px solid #eceef3;border-radius:14px;padding:10px 14px;color:#3b4050;font-size:13px;line-height:1.6}
+.me{align-self:flex-end;background:#eef2ff;border-color:#e2e8ff}
+.composer{position:fixed;left:26px;right:26px;bottom:22px;height:88px;border:1px solid #e4e7ec;border-radius:18px;background:#fff;box-shadow:0 6px 20px rgba(16,24,40,.06);display:flex;align-items:center;padding:0 18px;color:#b0b5c0;font-size:13px}
+.tag{position:fixed;left:616px;top:96px;font-size:11px;color:#8d93a1}
+</style>
+<div class="top">DeepSeek Harness · 拖出来的表盘</div>
+<div class="chat">
+  <div class="bubble">余额油量表默认贴在输入框上方靠右，按住就能拖走。</div>
+  <div class="bubble me">拖到不挡事的地方，松手位置会被记住，刷新页面也还在。</div>
+  <div class="bubble">双击卡片回到默认位置。</div>
+</div>
+<div class="composer">给 DeepSeek Harness 发消息…</div>
+<div class="tag">↑ 浮起状态：fixed 定位 + 更重阴影</div>
+<div class="bg-card" data-zone="high" data-phase="ready" data-floating="true" style="position:fixed;left:600px;top:118px;z-index:100">
+    <span class="bg-dial-host"><svg class="bg-dial" viewBox="0 0 120 68" role="img" aria-label="余额油量 89%"><path class="bg-track" d="M 18.00 60.00 A 42 42 0 0 1 102.00 60.00" /><path class="bg-arc" d="M 18.00 60.00 A 42 42 0 0 1 19.59 48.56" stroke="#F2574F" /><path class="bg-arc" d="M 20.58 45.50 A 42 42 0 0 1 58.39 18.03" stroke="#EFA13C" /><path class="bg-arc" d="M 61.61 18.03 A 42 42 0 0 1 102.00 60.00" stroke="#34B27B" /><g class="bg-needle" style="transform: rotate(69.30deg)"><circle cx="60" cy="60" r="11" class="bg-glow" fill="#34B27B" opacity="0.14" /><polygon class="bg-blade" points="57.4,60 60,28.5 62.6,60" /><circle cx="60" cy="60" r="5.4" class="bg-hub" /><circle cx="60" cy="60" r="1.9" class="bg-hub-dot" /></g></svg></span>
+    <span class="bg-info"><span class="bg-amount">¥88.50</span>
+    <span class="bg-sub">😄 油箱满满</span></span>
+  </div>
+</body>

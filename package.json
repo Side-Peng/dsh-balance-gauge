@@ -1,0 +1,76 @@
+{
+  "name": "dsh-balance-gauge",
+  "version": "0.1.0",
+  "description": "Cute fuel-gauge balance + tok/s speedometer for the DeepSeek Harness web GUI, pinned above the account row",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "src",
+    "scripts",
+    "cordis.patch.yml",
+    "LICENSE",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-renderer",
+        "@deepseek-ai/dsh-client-ui-session",
+        "@deepseek-ai/dsh-client-ui-slots"
+      ]
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-client-ui-conversation": "*",
+    "@deepseek-ai/dsh-client-ui-renderer": "*",
+    "@deepseek-ai/dsh-client-ui-session": "*",
+    "@deepseek-ai/dsh-client-ui-slots": "*",
+    "react": "^18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/dsh-client-ui-conversation": { "optional": true },
+    "@deepseek-ai/dsh-client-ui-renderer": { "optional": true },
+    "@deepseek-ai/dsh-client-ui-session": { "optional": true },
+    "@deepseek-ai/dsh-client-ui-slots": { "optional": true },
+    "react": { "optional": true }
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "keywords": [
+    "deepseek",
+    "dsh",
+    "plugin",
+    "gauge",
+    "balance",
+    "tokens-per-second",
+    "dashboard"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Side-Peng/dsh-balance-gauge.git"
+  },
+  "homepage": "https://github.com/Side-Peng/dsh-balance-gauge#readme",
+  "bugs": {
+    "url": "https://github.com/Side-Peng/dsh-balance-gauge/issues"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "probe:node": "node scripts/node-probe.mjs",
+    "probe:web": "node scripts/build.mjs && node scripts/harness.mjs",
+    "preview": "node scripts/build.mjs && node scripts/screenshot.mjs",
+    "prepublishOnly": "node scripts/build.mjs && node scripts/node-probe.mjs"
+  },
+  "license": "MIT"
+}
