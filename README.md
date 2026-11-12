@@ -152,6 +152,19 @@ node scripts/screenshot.mjs   # 用本机 Edge 无头截图 preview/gauge.png
 
 ## 已知限制
 
-- 宿主没起 Web 服务、或客户端没有 `conversation.input.dock` 这个 slot 时，插件安静地不出现。
+- 宿主没起 Web 服务、或侧边栏的 `sidebar.footer.action` 槽位不在（比如侧边栏插件没装载）时，插件安静地不出现。
 - 余额只在**页面打开时**拉取：一分钟一次 + 手动点击，不做服务端推送。
 - 插件只读账户快照，不含积分/代金券明细；赠送额并入总数，明细请到设置 → 账户看。
+
+## 宿主版本兼容
+
+| 宿主 | 状态 |
+| --- | --- |
+| 0.2.2-rc.1 | ✅ 当前适配版本 |
+| 0.2.1-rc.2 | ✅ 曾在该版本验证 |
+
+0.2.2 的破坏性变化与对应处理：
+
+- **`@deepseek-ai/dsh-client-ui-slots` 包被移除**（实现合并进 `dsh-client-ui-renderer`）。`dsh.client.inject` 里若还列它，宿主组合 boot graph 时找不到 supplier，整个客户端插件会被拒载——本包已改为 `api-remotes` + `client-locale` + `renderer` + `session`（分别提供 `remote` / `locale` / `slots` 服务，与官方 sidebar、account 插件的声明方式一致）。
+- **账户 Remote 的客户端版本字面量**随宿主发布递增；`FALLBACK_CLIENT_VERSION` 已同步为 `0.2.2-rc.1`（正常路径仍从 `__DSH_BOOT__.release.version` 读取，这个只是兜底）。
+- 未变的部分：`sidebar.footer.action` 槽位、`ctx.remote.account.getBalance`、`ctx.webServer.register({kind:'exact'})`、`window.__ModuleLoader__` bundle 形态。
